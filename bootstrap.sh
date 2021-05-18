@@ -1,5 +1,22 @@
 #!/bin/bash
 
+install_langages () {
+  cd ~/Downloads
+
+  echo "Install Golang"
+  wget "https://golang.org/dl/go1.16.4.linux-amd64.tar.gz" \
+  && sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+
+  echo "Install nvm"
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+  echo "Install docker"
+  curl -fsSL https://get.docker.com -o get-docker.sh \
+  && sudo sh get-docker.sh
+
+  cd ~
+}
+
 install_fonts () {
   echo "Downloading fonts"
   sudo apt-get install -y fonts-powerline fonts-firacode
@@ -27,27 +44,25 @@ install_depedencys () {
   git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
   git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
-  echo "Installing FZF, remember to aswer Y to all questions"
+  echo "Installing FZF"
   sleep 5
   sudo apt-get -y install fzf
-
-  echo "Install nvm"
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
   cd ~/Downloads
 
   echo "Install vscode"
-  wget "https://az764295.vo.msecnd.net/insider/82767cc1d7bf8cdea0f2897276d5d15aee91f3d9/code-insiders_1.57.0-1621228986_amd64.deb" \
-  && sudo dpkg -i ~/Downloads/code-insiders_1.57.0-1621228986_amd64.deb
+  curl "https://az764295.vo.msecnd.net/insider/82767cc1d7bf8cdea0f2897276d5d15aee91f3d9/code-insiders_1.57.0-1621228986_amd64.deb" -o code.deb \
+  && sudo dpkg -i ~/Downloads/code.deb
 
   echo "Install chrome"
-  wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
-  && sudo dpkg -i ~/Downloads/google-chrome-stable_current_amd64.deb
+  curl "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -o google-chrome.deb \
+  && sudo dpkg -i ~/Downloads/google-chrome.deb
 }
 
 remove_older_files () {
   echo "Removing older files"
-  rm -rf ~/.gitconfig ~/.zshrc ~/.bashrc ~/.config/terminator/config ~/.config/synapse/config.json
+  rm -rf ~/.gitconfig ~/.zshrc ~/.bashrc ~/.config/terminator/config \
+   ~/.config/synapse/config.json ~/Downloads/*.deb ~/Downloads/get-docker.sh
 }
 
 link_files () {
@@ -74,6 +89,7 @@ linux_bootstrap () {
   remove_older_files
   link_files
   show_completion_message
+  install_langages
 }
 
 linux_bootstrap
