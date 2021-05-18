@@ -9,6 +9,42 @@ export PATH=$PATH:/usr/local/go/bin
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+SPACESHIP_PROMPT_ORDER=(
+  dir           # Current directory section
+  git           # Git section (git_branch + git_status)
+  package       # Package version
+  node          # Node.js section
+  ruby          # Ruby section
+  xcode         # Xcode section
+  golang        # Go section
+  php           # PHP section
+  rust          # Rust section
+  aws           # Amazon Web Services section
+  kubectl_context
+  line_sep      # Line break
+  jobs          # Backgound jobs indicator
+  char          # Prompt character
+)
+
+SPACESHIP_DIR_TRUNC_PREFIX=".../"
+SPACESHIP_DIR_COLOR=yellow
+SPACESHIP_KUBECONTEXT_PREFIX="at "
+SPACESHIP_KUBECONTEXT_SYMBOL="⎈ "
+SPACESHIP_PACKAGE_PREFIX=" "
+SPACESHIP_GIT_STATUS_PREFIX="["
+SPACESHIP_GIT_STATUS_SUFFIX="]"
+SPACESHIP_GIT_BRANCH_PREFIX="[ "
+SPACESHIP_GIT_BRANCH_SUFFIX="]"
+SPACESHIP_GIT_STATUS_BEHIND=" ↓ Needs Pull "
+SPACESHIP_GIT_STATUS_AHEAD=" ↑ Needs Push "
+SPACESHIP_HOST_PREFIX="@"
+SPACESHIP_PROMPT_PREFIXES_SHOW=true
+SPACESHIP_TIME_SHOW=true
+SPACESHIP_TIME_PREFIX="⏰ "
+SPACESHIP_CHAR_SYMBOL="𝝺 "
+SPACESHIP_USER_PREFIX=""
+SPACESHIP_USER_SUFFIX=""
+
 ZSH_THEME="spaceship"
 
 # Set list of themes to pick from when loading at random
@@ -61,7 +97,7 @@ ZSH_THEME="spaceship"
 # "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
+HIST_STAMPS="mm/dd/yyyy"
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -71,7 +107,14 @@ ZSH_THEME="spaceship"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git nvm zsh-syntax-highlighting zsh-autosuggestions vscode zsh_reload)
+plugins=(
+  git
+  nvm
+  vscode
+  zsh_reload
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -100,6 +143,20 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+alias cd..="cd .."
+alias cd~="cd ~"
+
+alias kub=kubectl
+
+# Docker alias
+alias dkr=docker
+alias dkrc=docker-compose
+
+# Remove all container
+alias dkrrmf="docker rm -f $(docker container ps -aq)"
+# Remove all images
+alias dkrrmif="docker rmi -f $(docker images -aq)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
