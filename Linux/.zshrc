@@ -111,6 +111,11 @@ plugins=(
   git
   nvm
   vscode
+  fzf
+  docker
+  docker-compose
+  golang
+  node
   zsh_reload
   zsh-syntax-highlighting
   zsh-autosuggestions
@@ -157,9 +162,3 @@ alias dkrc=docker-compose
 alias dkrrmf="docker rm -f $(docker container ps -aq)"
 # Remove all images
 alias dkrrmif="docker rmi -f $(docker images -aq)"
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
-
