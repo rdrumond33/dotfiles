@@ -9,7 +9,6 @@
   cob = checkout -b
   ps = push
   pl = pull
-  cm = commit
   ca = !sh -c 'git add -A && git commit' -
   bump = !sh -c 'git add -A && git commit -m "bump" --no-verify'
   br = branch
