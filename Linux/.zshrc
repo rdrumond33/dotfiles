@@ -10,19 +10,23 @@ export PATH=$PATH:/usr/local/go/bin
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 SPACESHIP_PROMPT_ORDER=(
+  time          # Time stamps section
+  user          # Username section
   dir           # Current directory section
+  host          # Hostname section
   git           # Git section (git_branch + git_status)
   package       # Package version
   node          # Node.js section
   ruby          # Ruby section
-  xcode         # Xcode section
+  elixir        # Elixir section
   golang        # Go section
   php           # PHP section
   rust          # Rust section
-  aws           # Amazon Web Services section
-  kubectl_context
+  docker        # Docker section
   line_sep      # Line break
-  jobs          # Backgound jobs indicator
+  battery       # Battery level and status
+  vi_mode       # Vi-mode indicator
+  exit_code     # Exit code section
   char          # Prompt character
 )
 
@@ -116,6 +120,11 @@ plugins=(
   docker-compose
   golang
   node
+	nvm
+	npx
+	npm
+	asdf
+	flutter
   zsh_reload
   zsh-syntax-highlighting
   zsh-autosuggestions
@@ -152,13 +161,13 @@ source $ZSH/oh-my-zsh.sh
 alias cd..="cd .."
 alias cd~="cd ~"
 
-alias kub=kubectl
+alias kub="kubectl"
 
 # Docker alias
-alias dkr=docker
-alias dkrc=docker-compose
+alias dkr="docker"
+alias dkrc="docker-compose"
 
 # Remove all container
-alias dkrrmf="docker rm -f $(docker container ps -aq)"
+# alias dkrrmf="docker rm -f $(docker container ps -aq)"
 # Remove all images
-alias dkrrmif="docker rmi -f $(docker images -aq)"
+# alias dkrrmif="docker rmi -f $(docker images -aq)"

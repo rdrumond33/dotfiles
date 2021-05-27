@@ -19,47 +19,54 @@ upgrade_linux:
 install_fonts:
 	@echo "Downloading fonts"
 
+sync_files:
+	@rsync -avrh Linux/.zshrc $(HOME)/.zshrc
+	@rsync -avrh Linux/.bashrc $(HOME)/.bashrc
+	@rsync -avrh Linux/.gitconfig $(HOME)/.gitconfig
+	@rsync -avrh Linux/.config/terminator/config $(HOME)/.config/terminator/config
+	@rsync -avrh Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
+
 remove_older_files:
 	@echo "Removing older files"
-	@rm -rf ~/.gitconfig ~/.zshrc ~/.bashrc ~/.config/terminator/config \
-		~/.config/synapse/config.json ~/Downloads/*.deb ~/Downloads/get-docker.sh
+	@rm -rf $(HOME)/.gitconfig $(HOME)/.zshrc $(HOME)/.bashrc $(HOME)/.config/terminator/config \
+		$(HOME)/.config/synapse/config.json $(HOME)/Downloads/*.deb $(HOME)/Downloads/get-docker.sh
 
-link_files: remove_older_files
-	@ln ./Linux/.bashrc ~/.bashrc
-	@ln ./Linux/.gitconfig ~/.gitconfig
-	@ln ./Linux/.config/terminator/config ~/.config/terminator/config
-	@ln ./Linux/.config/synapse/config.json ~/.config/synapse/config.json
+link_files:
+	# @ln -s .Linux/.bashrc $(HOME)/.bashrc
+	@ln -s teste $(HOME)/teste
+	# @ln -s .Linux/.config/terminator/config $(HOME)/.config/terminator/config
+	# @ln -s .Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
 
-install_basic_config: install_langages
+install_basic_config:
 	@echo "Install dependencies basic desenvolvimts"
 	@sudo apt-get install -y \
 		build-essential zsh wget curl git \
 		terminator synapse plank neovim fzf \
-		fonts-powerline fonts-firacode deja-dup
+		fonts-powerline fonts-firacode deja-dup jq
 
 	@echo "Installing Oh My Zsh"
 	@sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 	@echo "Installing Spaceship theme"
-	@git clone https://github.com/denysdovhan/spaceship-prompt.git "$ZSH_CUSTOM/themes/spaceship-prompt" --depth=1
-	@ln -s "$ZSH_CUSTOM/themes/spaceship-prompt/spaceship.zsh-theme" "$ZSH_CUSTOM/themes/spaceship.zsh-theme"
+	@git clone https://github.com/denysdovhan/spaceship-prompt.git "$(ZSH_CUSTOM)/themes/spaceship-prompt" --depth=1
+	@ln -s "$(ZSH_CUSTOM)/themes/spaceship-prompt/spaceship.zsh-theme" "$(ZSH_CUSTOM)/themes/spaceship.zsh-theme"
 
 	@echo "Installing ZSH Plugins"
-	@git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-	@git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+	@git clone https://github.com/zsh-users/zsh-autosuggestions ${$(ZSH_CUSTOM):-$(HOME)/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+	@git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${$(ZSH_CUSTOM):-$(HOME)/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
 
-	@cd ~/Downloads
+	@cd $(HOME)/Downloads
 	@echo "Install vscode"
 	@curl "https://az764295.vo.msecnd.net/insider/82767cc1d7bf8cdea0f2897276d5d15aee91f3d9/code-insiders_1.57.0-1621228986_amd64.deb" -o code.deb \
-		&& sudo dpkg -i ~/Downloads/code.deb
+		&& sudo dpkg -i $(HOME)/Downloads/code.deb
 
 	@echo "Install chrome"
 	@curl "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -o google-chrome.deb \
-		&& sudo dpkg -i ~/Downloads/google-chrome.deb
-	@cd ~
+		&& sudo dpkg -i $(HOME)/Downloads/google-chrome.deb
+	@cd $(HOME)
 
 install_langages:
-	@cd ~/Downloads
+	@cd $(HOME)/Downloads
 
 	@echo "Install Golang"
 	@wget "https://golang.org/dl/go$(GOVERSION).linux-amd64.tar.gz" \
@@ -71,7 +78,6 @@ install_langages:
 	@echo "Install docker"
 	@curl -fsSL https://get.docker.com -o get-docker.sh \
 	  && sudo sh get-docker.sh
-	@cd ~
+	@cd $(HOME)
 
-bootstrap: install_basic_config, link_files, show_completion_message, upgrade_linux
-	@echo"Initialize configuration"
+bootstrap: install_basic_config link_files show_completion_message upgrade_linux

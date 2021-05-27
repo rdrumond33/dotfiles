@@ -19,7 +19,7 @@
   lg1 = log --oneline --decorate --pretty='format:%C(bold yellow)%h %C(dim white)|%C(reset)%C(bold red)%d %C(reset)%s %C(italic dim green)(%as)%Creset %Cblue<%aN>'
   tree = log --all --graph --decorate --date=relative --pretty='format:%C(bold yellow)%h%Creset%C(bold red)%d %Creset%s %Cgreen(%ad) %Cblue<%aN> %C(dim white)[Key: %GK]'
 [color]
-    branch = auto
-    diff = auto
-    status = auto
-    ui = auto
+	branch = auto
+	diff = auto
+	status = auto
+	ui = auto
