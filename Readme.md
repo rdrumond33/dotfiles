@@ -1,1 +1,7 @@
 # Dotfiles
+
+Install:
+
+```bash
+make
+```

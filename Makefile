@@ -1,6 +1,13 @@
 SHELL = /bin/bash
 GOVERSION = 1.16.4
 NVMVERSION = 0.38.0
+ZSH_CUSTOM = $(HOME)/.oh-my-zsh/custom/plugins
+TEMP_DIR = ./Linux/temp
+DOCKER_COMPOSE_VERSION = 1.29.2
+
+.PHONY: all
+all: bootstrap
+FORCE: ;
 
 show_completion_message:
 	@echo "Instalation completed"
@@ -18,24 +25,51 @@ upgrade_linux:
 
 install_fonts:
 	@echo "Downloading fonts"
+	@wget -O $(TEMP_DIR)/Anonymous-fonts.zip https://fonts.google.com/download\?family\=Anonymous%20Pro \
+		&& unzip $(TEMP_DIR)/Anonymous-fonts.zip -d $(TEMP_DIR)/Anonymous-fonts \
+
+	# Create file if not existis
+	@[ -d "$(HOME)/.fonts" ] || mkdir -p $(HOME)/.fonts
+	@mv $(TEMP_DIR)/Anonymous-fonts/*.ttf $(HOME)/.fonts
+
+	@rm -rf $(TEMP_DIR)/Anonymous-fonts \
+		$(TEMP_DIR)/Anonymous-fonts.zip
 
 sync_files:
 	@rsync -avrh Linux/.zshrc $(HOME)/.zshrc
 	@rsync -avrh Linux/.bashrc $(HOME)/.bashrc
 	@rsync -avrh Linux/.gitconfig $(HOME)/.gitconfig
-	@rsync -avrh Linux/.config/terminator/config $(HOME)/.config/terminator/config
-	@rsync -avrh Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
+	@mkdir -p $(HOME)/.config/terminator/ && rsync -avrh Linux/.config/terminator/config $(HOME)/.config/terminator/config
+	@mkdir -p $(HOME)/.config/synapse/ && rsync -avrh Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
 
 remove_older_files:
 	@echo "Removing older files"
-	@rm -rf $(HOME)/.gitconfig $(HOME)/.zshrc $(HOME)/.bashrc $(HOME)/.config/terminator/config \
-		$(HOME)/.config/synapse/config.json $(HOME)/Downloads/*.deb $(HOME)/Downloads/get-docker.sh
+	@rm -rf $(HOME)/.zshrc \
+		$(HOME)/.bashrc \
+		$(HOME)/.gitconfig \
+		$(HOME)/.config/terminator/config \
+		$(HOME)/.config/synapse/config.json
 
 link_files:
-	# @ln -s .Linux/.bashrc $(HOME)/.bashrc
-	@ln -s teste $(HOME)/teste
-	# @ln -s .Linux/.config/terminator/config $(HOME)/.config/terminator/config
-	# @ln -s .Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
+	@[ -d "$(HOME)/.config/terminator" ] || mkdir -p $(HOME)/.config/terminator
+	@[ -d "$(HOME)/.config/synapse" ] || mkdir -p $(HOME)/.config/synapse
+
+	@ln Linux/.zshrc $(HOME)/.zshrc
+	@ln Linux/.bashrc $(HOME)/.bashrc
+	@ln Linux/.gitconfig $(HOME)/.gitconfig
+	@ln Linux/.config/terminator/config $(HOME)/.config/terminator/config
+	@ln Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
+
+install_development_tools:
+	@echo "Install vscode"
+	@wget -O $(TEMP_DIR)/vscode.deb "https://az764295.vo.msecnd.net/stable/054a9295330880ed74ceaedda236253b4f39a335/code_1.56.2-1620838498_amd64.deb" \
+		&& sudo dpkg -i $(TEMP_DIR)/vscode.deb \
+		&& rm -f $(TEMP_DIR)/vscode.deb
+
+	@echo "Install chrome"
+	@wget -O $(TEMP_DIR)/google-chrome.deb "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
+		&& sudo dpkg -i $(TEMP_DIR)/google-chrome.deb \
+		&& rm -f $(TEMP_DIR)/google-chrome.deb
 
 install_basic_config:
 	@echo "Install dependencies basic desenvolvimts"
@@ -45,39 +79,31 @@ install_basic_config:
 		fonts-powerline fonts-firacode deja-dup jq
 
 	@echo "Installing Oh My Zsh"
-	@sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+	@wget -O $(TEMP_DIR)/OhMyZsh.sh https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh \
+		&& sh $(TEMP_DIR)/OhMyZsh.sh --unattended \
+		&& rm -f $(TEMP_DIR)/OhMyZsh.sh
 
-	@echo "Installing Spaceship theme"
-	@git clone https://github.com/denysdovhan/spaceship-prompt.git "$(ZSH_CUSTOM)/themes/spaceship-prompt" --depth=1
-	@ln -s "$(ZSH_CUSTOM)/themes/spaceship-prompt/spaceship.zsh-theme" "$(ZSH_CUSTOM)/themes/spaceship.zsh-theme"
-
-	@echo "Installing ZSH Plugins"
-	@git clone https://github.com/zsh-users/zsh-autosuggestions ${$(ZSH_CUSTOM):-$(HOME)/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
-	@git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${$(ZSH_CUSTOM):-$(HOME)/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
-
-	@cd $(HOME)/Downloads
-	@echo "Install vscode"
-	@curl "https://az764295.vo.msecnd.net/insider/82767cc1d7bf8cdea0f2897276d5d15aee91f3d9/code-insiders_1.57.0-1621228986_amd64.deb" -o code.deb \
-		&& sudo dpkg -i $(HOME)/Downloads/code.deb
-
-	@echo "Install chrome"
-	@curl "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -o google-chrome.deb \
-		&& sudo dpkg -i $(HOME)/Downloads/google-chrome.deb
-	@cd $(HOME)
+	@[ -d "$(HOME)/.zinit" ] || mkdir -p $(HOME)/.zinit
+	@git clone https://github.com/zdharma/zinit.git $(HOME)/.zinit/bin
 
 install_langages:
-	@cd $(HOME)/Downloads
-
 	@echo "Install Golang"
-	@wget "https://golang.org/dl/go$(GOVERSION).linux-amd64.tar.gz" \
-    && sudo tar -C /usr/local -xzf go$(GOVERSION).linux-amd64.tar.gz
+	@wget -O $(TEMP_DIR)/go-install.tar.gz "https://golang.org/dl/go$(GOVERSION).linux-amd64.tar.gz" \
+    && sudo tar -C /usr/local -xzf $(TEMP_DIR)/go-install.tar.gz \
+		&& rm -f $(TEMP_DIR)/go-install.tar.gz
 
 	@echo "Install nvm"
-	@curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v$(NVMVERSION)/install.sh | bash
+	@wget -O $(TEMP_DIR)/nvm-install.sh https://raw.githubusercontent.com/nvm-sh/nvm/v$(NVMVERSION)/install.sh \
+		&& sh $(TEMP_DIR)/nvm-install.sh \
+		&& rm -f $(TEMP_DIR)/nvm-install.sh
 
 	@echo "Install docker"
-	@curl -fsSL https://get.docker.com -o get-docker.sh \
-	  && sudo sh get-docker.sh
-	@cd $(HOME)
+	@wget -O $(TEMP_DIR)/get-docker.sh https://get.docker.com \
+	  && sudo sh $(TEMP_DIR)/get-docker.sh \
+		&& rm -f $(TEMP_DIR)/get-docker.sh
 
-bootstrap: install_basic_config link_files show_completion_message upgrade_linux
+	@echo "Install docker-compose"
+	@sudo curl -L "https://github.com/docker/compose/releases/download/$(DOCKER_COMPOSE_VERSION)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+	@sudo chmod +x /usr/local/bin/docker-compose
+
+bootstrap: install_basic_config install_langages install_fonts remove_older_files link_files install_development_tools upgrade_linux show_completion_message

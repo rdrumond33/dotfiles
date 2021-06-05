@@ -49,7 +49,7 @@ SPACESHIP_CHAR_SYMBOL="𝝺 "
 SPACESHIP_USER_PREFIX=""
 SPACESHIP_USER_SUFFIX=""
 
-ZSH_THEME="spaceship"
+ZSH_THEME=""
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -126,8 +126,6 @@ plugins=(
 	asdf
 	flutter
   zsh_reload
-  zsh-syntax-highlighting
-  zsh-autosuggestions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -161,13 +159,19 @@ source $ZSH/oh-my-zsh.sh
 alias cd..="cd .."
 alias cd~="cd ~"
 
-alias kub="kubectl"
+# alias kub="kubectl"
 
-# Docker alias
-alias dkr="docker"
-alias dkrc="docker-compose"
+# # Docker alias
+# alias dkr="docker"
+# alias dkrc="docker-compose"
 
 # Remove all container
 # alias dkrrmf="docker rm -f $(docker container ps -aq)"
 # Remove all images
 # alias dkrrmif="docker rmi -f $(docker images -aq)"
+
+source ~/.zinit/bin/zinit.zsh
+
+zinit light zsh-users/zsh-autosuggestions
+zinit light zdharma/fast-syntax-highlighting
+zinit light spaceship-prompt/spaceship-prompt
