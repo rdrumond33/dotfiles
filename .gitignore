@@ -1,4 +1,5 @@
-/temp/*
 *.deb
 *.zip
 Anonymous
+/backups_files/backup/.*
+/backups_files/backup/.*
