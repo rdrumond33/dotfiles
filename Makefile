@@ -18,6 +18,8 @@ CODE_URL:=https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x
 CHROME_URL:=https://www.google.com/chrome/thank-you.html?statcb=0&installdataindex=empty&defaultbrowser=0#
 ANONYMOUS_URL:=https://fonts.google.com/download\?family\=Anonymous%20Pro
 OMYZSH_URL:=https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+DBEAVE_URL:=https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
+LENS_URL:=https://api.k8slens.dev/binaries/Lens-5.5.4-latest.20220609.2.amd64.deb
 
 TEMP_DIR=$(CURRENTDIR)/temp
 FONT_DIR:=$(HOME)/.fonts
@@ -44,7 +46,10 @@ RESET:=$(shell tput -Txterm sgr0)
 APP_DEFAULTS:=build-essential curl git zsh wget curl \
 	git terminator synapse plank neovim fzf fonts-powerline \
 	fonts-firacode deja-dup jq coreutils dirmngr gpg gawk \
-	libsigsegv2 pass tree uidmap
+	libsigsegv2 pass tree uidmap flatpak gnome-software-plugin-flatpak \
+	podman software-properties-common
+
+REPOSITORY:=ppa:neovim-ppa/stable
 
 .PHONY: all
 all: help
@@ -61,6 +66,14 @@ help: ## Show this help.
 		else if (/^## .*$$/) {printf "  ${CYAN}%s${RESET}\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST)
 
+$(TEMP_DIR)/dbeaver.deb:
+	@cd $(TEMP_DIR) \
+		&& wget -c -O dbeaver.deb $(DBEAVE_URL)
+
+$(TEMP_DIR)/lens.deb:
+	@cd $(TEMP_DIR) \
+		&& wget -c -O lens.deb $(LENS_URL)
+
 $(FONT_DIR):
 	@echo -d "\nCreate Folder .fonts\n"
 	@mkdir -p $(HOME)/.fonts
@@ -70,6 +83,7 @@ $(TEMP_DIR)/Anonymous.zip:
 		&& unzip Anonymous.zip -d Anonymous
 
 $(TEMP_DIR)/docker.deb:
+	@echo -d "\ndownload docker.deb\n"
 	@cd $(TEMP_DIR) \
 		&& wget -c -O docker.deb $(DOCKER_URL)
 
@@ -200,16 +214,35 @@ endif
 hadolint: $(HADOLINT_DIR_BIN)
 	@echo -d "\nHadolint installed\n"
 
-install-znit:
-	@$(shell bash -c "$(curl --fail --show-error --silent --location https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)")
+.PHONY: dbeaver
+dbeaver: $(TEMP_DIR)/dbeaver.deb
+	@echo -d "Install dbeaver"
+	@cd $(TEMP_DIR) \
+		&& sudo dpkg -i $(TEMP_DIR)/dbeaver.deb
+
+.PHONY: lens
+lens: $(TEMP_DIR)/lens.deb
+	@echo -d "Install Lens"
+	@cd $(TEMP_DIR) \
+		&& sudo dpkg -i $(TEMP_DIR)/lens.deb
+
+install-znit: $(ZINIT_DIR)
+	@zinit self-update
 
 cargo-installs:
 	@cargo install ytop exa bat starship --locked
 
+repository:
+	@sudo add-apt-repository -y $(REPOSITORY) && sudo apt-get update
+
 # vscode chrome
-install-depes: upadate ## install apps default
+install-depes: repository upadate ## install apps default
 	@sudo apt install -y $(APP_DEFAULTS) \
+		&& flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo \
 		&& sudo apt autoremove
+
+install-faltpack-deps:
+	flatpak install flathub com.spotify.Client com.google.AndroidStudio
 
 asdf-reshim:
 	@asdf reshim
@@ -260,7 +293,7 @@ remove_older_files:
 # 	@ln Linux/.config/terminator/config $(HOME)/.config/terminator/config
 # 	@ln Linux/.config/synapse/config.json $(HOME)/.config/synapse/config.json
 
-install: install-depes fonts docker hadolint rust golang node java flutter cargo-installs asdf-reshim
+install: install-depes fonts docker hadolint rust golang node java flutter lens dbeaver cargo-installs asdf-reshim
 	@echo -d "Start install deps"
 
 bootstrap: backup_files install

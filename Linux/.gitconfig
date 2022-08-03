@@ -1,12 +1,14 @@
 [user]
-	email = rodrigodru33@gmail.com
+	email = 31081356+rdrumond33@users.noreply.github.com
 	name = Rodrigo Drumond de Paula
 [core]
 	editor = vim
 [alias]
   st = status
   co = checkout
-  cob = checkout -b
+	cmt = checkout master
+	cm = checkout main
+  cb = checkout -b
   ps = push
   pl = pull
   ca = !sh -c 'git add -A && git commit' -
